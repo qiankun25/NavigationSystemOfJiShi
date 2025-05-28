@@ -1,0 +1,218 @@
+{
+  "rooms": [
+    {
+      "id": "425",
+      "name": "425办公室",
+      "type": "office",
+      "position": {"x": -45, "y": 0, "z": -20},
+      "dimensions": {"width": 8, "height": 4, "depth": 6},
+      "description": "教师办公室"
+    },
+    {
+      "id": "428",
+      "name": "428办公室",
+      "type": "office",
+      "position": {"x": -35, "y": 0, "z": -20},
+      "dimensions": {"width": 8, "height": 4, "depth": 6},
+      "description": "教师办公室"
+    },
+    {
+      "id": "430",
+      "name": "430办公室",
+      "type": "office",
+      "position": {"x": -25, "y": 0, "z": -20},
+      "dimensions": {"width": 8, "height": 4, "depth": 6},
+      "description": "教师办公室"
+    },
+    {
+      "id": "431",
+      "name": "431办公室",
+      "type": "office",
+      "position": {"x": -15, "y": 0, "z": -20},
+      "dimensions": {"width": 8, "height": 4, "depth": 6},
+      "description": "教师办公室"
+    },
+    {
+      "id": "432",
+      "name": "432办公室",
+      "type": "office",
+      "position": {"x": -5, "y": 0, "z": -20},
+      "dimensions": {"width": 8, "height": 4, "depth": 6},
+      "description": "教师办公室"
+    },
+    {
+      "id": "441",
+      "name": "441实验室",
+      "type": "lab",
+      "position": {"x": 5, "y": 0, "z": -20},
+      "dimensions": {"width": 8, "height": 4, "depth": 6},
+      "description": "实验室"
+    },
+    {
+      "id": "443",
+      "name": "443实验室",
+      "type": "lab",
+      "position": {"x": 15, "y": 0, "z": -20},
+      "dimensions": {"width": 8, "height": 4, "depth": 6},
+      "description": "实验室"
+    },
+    {
+      "id": "446",
+      "name": "446实验室",
+      "type": "lab",
+      "position": {"x": 25, "y": 0, "z": -20},
+      "dimensions": {"width": 8, "height": 4, "depth": 6},
+      "description": "实验室"
+    },
+    {
+      "id": "449",
+      "name": "449实验室",
+      "type": "lab",
+      "position": {"x": 35, "y": 0, "z": -20},
+      "dimensions": {"width": 8, "height": 4, "depth": 6},
+      "description": "实验室"
+    },
+    {
+      "id": "450",
+      "name": "450实验室",
+      "type": "lab",
+      "position": {"x": 45, "y": 0, "z": -20},
+      "dimensions": {"width": 8, "height": 4, "depth": 6},
+      "description": "实验室"
+    },
+    {
+      "id": "455",
+      "name": "455实验室",
+      "type": "lab",
+      "position": {"x": 45, "y": 0, "z": -10},
+      "dimensions": {"width": 8, "height": 4, "depth": 6},
+      "description": "实验室"
+    },
+    {
+      "id": "414",
+      "name": "414实验室",
+      "type": "lab",
+      "position": {"x": -45, "y": 0, "z": 20},
+      "dimensions": {"width": 8, "height": 4, "depth": 6},
+      "description": "实验室"
+    },
+    {
+      "id": "416",
+      "name": "416实验室",
+      "type": "lab",
+      "position": {"x": -35, "y": 0, "z": 20},
+      "dimensions": {"width": 8, "height": 4, "depth": 6},
+      "description": "实验室"
+    },
+    {
+      "id": "418",
+      "name": "418实验室",
+      "type": "lab",
+      "position": {"x": -25, "y": 0, "z": 20},
+      "dimensions": {"width": 8, "height": 4, "depth": 6},
+      "description": "实验室"
+    },
+    {
+      "id": "419",
+      "name": "419实验室",
+      "type": "lab",
+      "position": {"x": -15, "y": 0, "z": 20},
+      "dimensions": {"width": 8, "height": 4, "depth": 6},
+      "description": "实验室"
+    },
+    {
+      "id": "417",
+      "name": "417实验室",
+      "type": "lab",
+      "position": {"x": -5, "y": 0, "z": 20},
+      "dimensions": {"width": 8, "height": 4, "depth": 6},
+      "description": "实验室"
+    },
+    {
+      "id": "409",
+      "name": "409实验室",
+      "type": "lab",
+      "position": {"x": 15, "y": 0, "z": 20},
+      "dimensions": {"width": 8, "height": 4, "depth": 6},
+      "description": "实验室"
+    },
+    {
+      "id": "407",
+      "name": "407实验室",
+      "type": "lab",
+      "position": {"x": 25, "y": 0, "z": 20},
+      "dimensions": {"width": 8, "height": 4, "depth": 6},
+      "description": "实验室"
+    },
+    {
+      "id": "402",
+      "name": "402实验室",
+      "type": "lab",
+      "position": {"x": 35, "y": 0, "z": 20},
+      "dimensions": {"width": 8, "height": 4, "depth": 6},
+      "description": "实验室"
+    },
+    {
+      "id": "408",
+      "name": "408实验室",
+      "type": "lab",
+      "position": {"x": 45, "y": 0, "z": 20},
+      "dimensions": {"width": 8, "height": 4, "depth": 6},
+      "description": "实验室"
+    }
+  ],
+  "corridors": [
+    {
+      "id": "main-corridor-1",
+      "width": 3,
+      "path": [
+        {"x": -50, "y": 0, "z": -15},
+        {"x": 50, "y": 0, "z": -15}
+      ]
+    },
+    {
+      "id": "main-corridor-2",
+      "width": 3,
+      "path": [
+        {"x": -50, "y": 0, "z": 15},
+        {"x": 50, "y": 0, "z": 15}
+      ]
+    },
+    {
+      "id": "connecting-corridor-1",
+      "width": 3,
+      "path": [
+        {"x": 50, "y": 0, "z": -15},
+        {"x": 50, "y": 0, "z": 15}
+      ]
+    },
+    {
+      "id": "connecting-corridor-2",
+      "width": 3,
+      "path": [
+        {"x": -50, "y": 0, "z": -15},
+        {"x": -50, "y": 0, "z": 15}
+      ]
+    }
+  ],
+  "areas": [
+    {
+      "id": "teaching-area",
+      "name": "教学区",
+      "position": {"x": -30, "y": 0, "z": -20},
+      "dimensions": {"width": 20, "height": 0.1, "depth": 10}
+    },
+    {
+      "id": "experimental-area-1",
+      "name": "实验区1",
+      "position": {"x": 20, "y": 0, "z": -20},
+      "dimensions": {"width": 30, "height": 0.1, "depth": 10}
+    },
+    {
+      "id": "experimental-area-2",
+      "name": "实验区2",
+      "position": {"x": 20, "y": 0, "z": 20},
+      "dimensions": {"width": 30, "height": 0.1, "depth": 10}
+    }
+  ]
+} 
