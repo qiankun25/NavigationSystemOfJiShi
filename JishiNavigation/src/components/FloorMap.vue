@@ -10,6 +10,21 @@
             <h3>{{ selectedRoom.name }}</h3>
             <p>{{ selectedRoom.description }}</p>
         </div>
+        <div class="loading" v-if="isLoading">
+            <div class="loading-text">加载中... {{ loadingProgress }}%</div>
+        </div>
+        <div class="error-message" v-if="errorMessage">
+            {{ errorMessage }}
+        </div>
+        <div class="controls-tips">
+            <h3>控制提示：</h3>
+            <ul>
+                <li>左键拖动：旋转视角</li>
+                <li>右键拖动：平移视角</li>
+                <li>滚轮：缩放</li>
+                <li>双击：重置视角</li>
+            </ul>
+        </div>
     </div>
 </template>
 
@@ -20,6 +35,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader'
 import roomsData from '@/assets/data/rooms.json'
 import { markRaw } from 'vue'
+import gsap from 'gsap'
 
 export default {
     name: 'FloorMap',
@@ -27,6 +43,9 @@ export default {
         return {
             selectedRoom: null,
             searchQuery: '',
+            isLoading: true,
+            loadingProgress: 0,
+            errorMessage: '',
             _threeObjects: markRaw({
                 scene: null,
                 camera: null,
@@ -36,7 +55,8 @@ export default {
                 animationFrameId: null,
                 raycaster: null,
                 mouse: null,
-                model: null
+                model: null,
+                defaultCameraPosition: new THREE.Vector3(5, 5, 5)
             })
         }
     },
@@ -62,12 +82,12 @@ export default {
 
             // 创建相机
             three.camera = new THREE.PerspectiveCamera(
-                60,
+                75,
                 window.innerWidth / window.innerHeight,
                 0.1,
                 1000
             )
-            three.camera.position.set(50, 50, 50)
+            three.camera.position.copy(three.defaultCameraPosition)
             three.camera.lookAt(0, 0, 0)
 
             // 创建渲染器
@@ -81,24 +101,38 @@ export default {
             three.renderer.shadowMap.type = THREE.PCFSoftShadowMap
             this.$refs.container.appendChild(three.renderer.domElement)
 
-            // 添加控制器
+            // 添加并配置 OrbitControls
             three.controls = new OrbitControls(three.camera, three.renderer.domElement)
-            three.controls.enableDamping = true
-            three.controls.dampingFactor = 0.05
-            three.controls.maxPolarAngle = Math.PI / 2
-            three.controls.minDistance = 20
-            three.controls.maxDistance = 150
+            three.controls.enableDamping = true // 启用阻尼效果
+            three.controls.dampingFactor = 0.05 // 阻尼系数
+            three.controls.rotateSpeed = 0.5 // 旋转速度
+            three.controls.zoomSpeed = 1.2 // 缩放速度
+            three.controls.panSpeed = 0.8 // 平移速度
+            three.controls.minDistance = 2 // 最小缩放距离
+            three.controls.maxDistance = 20 // 最大缩放距离
+            three.controls.maxPolarAngle = Math.PI / 1.5 // 限制垂直旋转角度
+            three.controls.enablePan = true // 启用平移
+            three.controls.screenSpacePanning = true // 使平移始终平行于屏幕
+
+            // 添加双击重置功能
+            this.$refs.container.addEventListener('dblclick', this.resetCamera)
 
             // 添加光源
             const ambientLight = new THREE.AmbientLight(0xffffff, 0.6)
             three.scene.add(ambientLight)
 
             const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8)
-            directionalLight.position.set(50, 50, 50)
+            directionalLight.position.set(10, 10, 10)
             directionalLight.castShadow = true
-            directionalLight.shadow.mapSize.width = 2048
-            directionalLight.shadow.mapSize.height = 2048
             three.scene.add(directionalLight)
+
+            // 添加辅助网格
+            const gridHelper = new THREE.GridHelper(10, 10)
+            three.scene.add(gridHelper)
+
+            // 添加坐标轴辅助
+            const axesHelper = new THREE.AxesHelper(5)
+            three.scene.add(axesHelper)
         },
 
         loadModel() {
@@ -106,7 +140,7 @@ export default {
 
             // 创建DRACOLoader实例
             const dracoLoader = new DRACOLoader()
-            dracoLoader.setDecoderPath('/draco/') // 设置DRACO解码器路径
+            dracoLoader.setDecoderPath('/draco/')
 
             // 创建GLTFLoader实例
             const loader = new GLTFLoader()
@@ -116,24 +150,40 @@ export default {
             loader.load(
                 '/models/model.glb',
                 (gltf) => {
+                    console.log('Model loaded successfully:', gltf)
                     three.model = gltf.scene
-                    three.model.scale.set(1, 1, 1) // 根据需要调整模型大小
-                    three.model.position.set(0, 0, 0) // 根据需要调整模型位置
-                    three.scene.add(three.model)
 
-                    // 遍历模型中的所有网格
-                    gltf.scene.traverse((child) => {
-                        if (child.isMesh) {
-                            child.castShadow = true
-                            child.receiveShadow = true
-                        }
-                    })
+                    // 自动调整模型大小和位置
+                    const box = new THREE.Box3().setFromObject(gltf.scene)
+                    const center = box.getCenter(new THREE.Vector3())
+                    const size = box.getSize(new THREE.Vector3())
+
+                    // 计算适当的缩放比例
+                    const maxDim = Math.max(size.x, size.y, size.z)
+                    const scale = 5 / maxDim
+                    gltf.scene.scale.multiplyScalar(scale)
+
+                    // 将模型居中
+                    gltf.scene.position.sub(center.multiplyScalar(scale))
+
+                    three.scene.add(gltf.scene)
+
+                    // 调整相机位置以适应模型
+                    const distance = Math.max(size.x, size.y, size.z) * 2
+                    three.camera.position.set(distance, distance, distance)
+                    three.camera.lookAt(0, 0, 0)
+
+                    this.isLoading = false
+                    this.loadingProgress = 100
                 },
                 (xhr) => {
-                    console.log((xhr.loaded / xhr.total * 100) + '% loaded')
+                    this.loadingProgress = Math.round((xhr.loaded / xhr.total) * 100)
+                    console.log(this.loadingProgress + '% loaded')
                 },
                 (error) => {
-                    console.error('An error happened:', error)
+                    console.error('Error loading model:', error)
+                    this.errorMessage = '模型加载失败: ' + error.message
+                    this.isLoading = false
                 }
             )
         },
@@ -360,6 +410,11 @@ export default {
             Object.keys(three).forEach(key => {
                 three[key] = null
             })
+
+            // 移除双击事件监听器
+            if (this.$refs.container) {
+                this.$refs.container.removeEventListener('dblclick', this.resetCamera)
+            }
         },
 
         onWindowResize() {
@@ -393,6 +448,37 @@ export default {
                     }
                 })
             }
+        },
+
+        resetCamera() {
+            const three = this._threeObjects
+            if (three.controls) {
+                // 使用 GSAP 添加动画效果
+                const duration = 1
+                const ease = 'power2.inOut'
+
+                // 重置相机位置
+                gsap.to(three.camera.position, {
+                    duration,
+                    ease,
+                    x: three.defaultCameraPosition.x,
+                    y: three.defaultCameraPosition.y,
+                    z: three.defaultCameraPosition.z
+                })
+
+                // 重置控制器目标点
+                gsap.to(three.controls.target, {
+                    duration,
+                    ease,
+                    x: 0,
+                    y: 0,
+                    z: 0,
+                    onUpdate: () => {
+                        three.camera.lookAt(three.controls.target)
+                        three.controls.update()
+                    }
+                })
+            }
         }
     }
 }
@@ -403,6 +489,7 @@ export default {
     width: 100vw;
     height: 100vh;
     position: relative;
+    background-color: #f0f0f0;
 }
 
 .scene-container {
@@ -433,5 +520,60 @@ export default {
     padding: 20px;
     border-radius: 8px;
     max-width: 300px;
+}
+
+.loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.loading-text {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.error-message {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 0, 0, 0.7);
+    color: white;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.controls-tips {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 15px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    z-index: 1000;
+}
+
+.controls-tips h3 {
+    margin: 0 0 10px 0;
+    font-size: 16px;
+}
+
+.controls-tips ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.controls-tips li {
+    margin: 5px 0;
 }
 </style>
