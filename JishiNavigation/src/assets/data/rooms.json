@@ -1,166 +1,207 @@
 {
-  "rooms": [
-    {
-      "id": "425",
-      "name": "425办公室",
-      "type": "office",
-      "position": {"x": -45, "y": 0, "z": -20},
-      "dimensions": {"width": 8, "height": 4, "depth": 6},
-      "description": "教师办公室"
-    },
-    {
-      "id": "428",
-      "name": "428办公室",
-      "type": "office",
-      "position": {"x": -35, "y": 0, "z": -20},
-      "dimensions": {"width": 8, "height": 4, "depth": 6},
-      "description": "教师办公室"
-    },
-    {
-      "id": "430",
-      "name": "430办公室",
-      "type": "office",
-      "position": {"x": -25, "y": 0, "z": -20},
-      "dimensions": {"width": 8, "height": 4, "depth": 6},
-      "description": "教师办公室"
-    },
-    {
-      "id": "431",
-      "name": "431办公室",
-      "type": "office",
-      "position": {"x": -15, "y": 0, "z": -20},
-      "dimensions": {"width": 8, "height": 4, "depth": 6},
-      "description": "教师办公室"
-    },
-    {
-      "id": "432",
-      "name": "432办公室",
-      "type": "office",
-      "position": {"x": -5, "y": 0, "z": -20},
-      "dimensions": {"width": 8, "height": 4, "depth": 6},
-      "description": "教师办公室"
-    },
-    {
-      "id": "441",
-      "name": "441实验室",
-      "type": "lab",
-      "position": {"x": 5, "y": 0, "z": -20},
-      "dimensions": {"width": 8, "height": 4, "depth": 6},
-      "description": "实验室"
-    },
-    {
-      "id": "443",
-      "name": "443实验室",
-      "type": "lab",
-      "position": {"x": 15, "y": 0, "z": -20},
-      "dimensions": {"width": 8, "height": 4, "depth": 6},
-      "description": "实验室"
-    },
-    {
-      "id": "446",
-      "name": "446实验室",
-      "type": "lab",
-      "position": {"x": 25, "y": 0, "z": -20},
-      "dimensions": {"width": 8, "height": 4, "depth": 6},
-      "description": "实验室"
-    },
-    {
-      "id": "449",
-      "name": "449实验室",
-      "type": "lab",
-      "position": {"x": 35, "y": 0, "z": -20},
-      "dimensions": {"width": 8, "height": 4, "depth": 6},
-      "description": "实验室"
-    },
-    {
-      "id": "450",
-      "name": "450实验室",
-      "type": "lab",
-      "position": {"x": 45, "y": 0, "z": -20},
-      "dimensions": {"width": 8, "height": 4, "depth": 6},
-      "description": "实验室"
-    },
-    {
-      "id": "455",
-      "name": "455实验室",
-      "type": "lab",
-      "position": {"x": 45, "y": 0, "z": -10},
-      "dimensions": {"width": 8, "height": 4, "depth": 6},
-      "description": "实验室"
-    },
-    {
-      "id": "414",
-      "name": "414实验室",
-      "type": "lab",
-      "position": {"x": -45, "y": 0, "z": 20},
-      "dimensions": {"width": 8, "height": 4, "depth": 6},
-      "description": "实验室"
-    },
-    {
-      "id": "416",
-      "name": "416实验室",
-      "type": "lab",
-      "position": {"x": -35, "y": 0, "z": 20},
-      "dimensions": {"width": 8, "height": 4, "depth": 6},
-      "description": "实验室"
-    },
-    {
-      "id": "418",
-      "name": "418实验室",
-      "type": "lab",
-      "position": {"x": -25, "y": 0, "z": 20},
-      "dimensions": {"width": 8, "height": 4, "depth": 6},
-      "description": "实验室"
-    },
-    {
-      "id": "419",
-      "name": "419实验室",
-      "type": "lab",
-      "position": {"x": -15, "y": 0, "z": 20},
-      "dimensions": {"width": 8, "height": 4, "depth": 6},
-      "description": "实验室"
-    },
-    {
-      "id": "417",
-      "name": "417实验室",
-      "type": "lab",
-      "position": {"x": -5, "y": 0, "z": 20},
-      "dimensions": {"width": 8, "height": 4, "depth": 6},
-      "description": "实验室"
-    },
-    {
-      "id": "409",
-      "name": "409实验室",
-      "type": "lab",
-      "position": {"x": 15, "y": 0, "z": 20},
-      "dimensions": {"width": 8, "height": 4, "depth": 6},
-      "description": "实验室"
-    },
-    {
-      "id": "407",
-      "name": "407实验室",
-      "type": "lab",
-      "position": {"x": 25, "y": 0, "z": 20},
-      "dimensions": {"width": 8, "height": 4, "depth": 6},
-      "description": "实验室"
-    },
-    {
-      "id": "402",
-      "name": "402实验室",
-      "type": "lab",
-      "position": {"x": 35, "y": 0, "z": 20},
-      "dimensions": {"width": 8, "height": 4, "depth": 6},
-      "description": "实验室"
-    },
-    {
-      "id": "408",
-      "name": "408实验室",
-      "type": "lab",
-      "position": {"x": 45, "y": 0, "z": 20},
-      "dimensions": {"width": 8, "height": 4, "depth": 6},
-      "description": "实验室"
-    }
-  ],
+  "rooms": 
+  [
+      {
+        "id": "407",
+        "name": "研究生工作室-407",
+        "type": "office",
+        "description": "研究生工作室",
+        "teachers": [],
+        "image": "/images/407.png"
+      },
+      {
+        "id": "408",
+        "name": "研究生工作室-408",
+        "type": "office",
+        "description": "研究生工作室",
+        "teachers": [],
+        "image": "/images/408.png"
+      },
+      {
+        "id": "409",
+        "name": "研究生工作室-409",
+        "type": "office",
+        "description": "研究生工作室",
+        "teachers": [],
+        "image": "/images/409.png"
+      },
+      {
+        "id": "410",
+        "name": "教研室-410",
+        "type": "office",
+        "description": "教研室",
+        "teachers": ["王冬青", "李江峰", "夏波涌", "张颖"],
+        "image": "/images/410.png"
+      },
+      {
+        "id": "412",
+        "name": "教研室-412",
+        "type": "office",
+        "description": "教研室",
+        "teachers": ["刘岩", "张慧娟", "孙萍", "罗怡桂"],
+        "image": "/images/412.png"
+      },
+      {
+        "id": "414",
+        "name": "实验室-414",
+        "type": "lab",
+        "description": "实验室",
+        "teachers": [],
+        "image": "/images/414.png"
+      },
+      {
+        "id": "416",
+        "name": "教学机房-416",
+        "type": "lab",
+        "description": "教学机房",
+        "teachers": [],
+        "image": "/images/416.png"
+      },
+      {
+        "id": "417",
+        "name": "会议室-417",
+        "type": "office",
+        "description": "会议室",
+        "teachers": [],
+        "image": "/images/417.png"
+      },
+      {
+        "id": "418",
+        "name": "研究生工作室-418",
+        "type": "office",
+        "description": "研究生工作室",
+        "teachers": [],
+        "image": "/images/418.png"
+      },
+      {
+        "id": "419",
+        "name": "实验室-419",
+        "type": "lab",
+        "description": "实验室",
+        "teachers": [],
+        "image": "/images/419.png"
+      },
+      {
+        "id": "426",
+        "name": "教学机房-426",
+        "type": "lab",
+        "description": "教学机房",
+        "teachers": [],
+        "image": "/images/426.png"
+      },
+      {
+        "id": "428",
+        "name": "服务器机房-428",
+        "type": "office",
+        "description": "服务器机房",
+        "teachers": [],
+        "image": "/images/428.png"
+      },
+      {
+        "id": "430",
+        "name": "教学机房-430",
+        "type": "lab",
+        "description": "教学机房",
+        "teachers": [],
+        "image": "/images/430.png"
+      },
+      {
+        "id": "432",
+        "name": "党员之家-432",
+        "type": "office",
+        "description": "党员之家",
+        "teachers": [],
+        "image": "/images/432.png"
+      },
+      {
+        "id": "434",
+        "name": "阶梯教室-434",
+        "type": "lab",
+        "description": "阶梯教室",
+        "teachers": [],
+        "image": "/images/434.png"
+      },
+      {
+        "id": "442L",
+        "name": "教务办公室-442L",
+        "type": "office",
+        "description": "教务办公室",
+        "teachers": ["刘梦露", "李慧敏", "王彩霞", "杨丹", "姚仕仪"],
+        "image": "/images/442L.png"
+      },
+      {
+        "id": "442R",
+        "name": "学院办公室-442R",
+        "type": "office",
+        "description": "学院办公室",
+        "teachers": ["闫鹏","林伊凡","张雅静","张晶","钱银飞","王昊榕","俞晓静"],
+        "image": "/images/442R.png"
+      },
+      {
+        "id": "443",
+        "name": "实验中心-443",
+        "type": "office",
+        "description": "实验中心",
+        "teachers": ["陈梁", "杨旻", "严海州"],
+        "image": "/images/443.png"
+      },
+      {
+        "id": "444",
+        "name": "档案室-444",
+        "type": "office",
+        "description": "档案室",
+        "teachers": [],
+        "image": "/images/444.png"
+      },
+      {
+        "id": "446",
+        "name": "学工办-446",
+        "type": "office",
+        "description": "学工办",
+        "teachers": ["张砚秋", "丁瑞庭", "葛蕾", "焦嘉欣", "钟梦莹", "陈璞皎", "王晓文"],
+        "image": "/images/446.png"
+      },
+      {
+        "id": "448",
+        "name": "副书记办公室-448",
+        "type": "office",
+        "description": "副书记办公室",
+        "teachers": ["陈荣", "吴晓培", "宋井宽"],
+        "image": "/images/448.png"
+      },
+      {
+        "id": "450",
+        "name": "党委书记办公室-450L,院长办公室-450R",
+        "type": "office",
+        "description": "党委书记办公室,院长办公室",
+        "teachers": ["熊岚", "申恒涛"],
+        "image": "/images/450.png"
+      },
+      {
+        "id": "451",
+        "name": "副院长办公室-451-1,副院长办公室-451-2,副院长办公室-451-3",
+        "type": "office",
+        "description": "副院长办公室",
+        "teachers": ["王成", "何良华", "张林"],
+        "image": "/images/451.png"
+      },
+      {
+        "id":"455",
+        "name":"会议室-455",
+        "type":"office",
+        "description":"会议室",
+        "teachers":[],
+        "image":"/images/455.png"
+      },
+      {
+        "id": "456",
+        "name": "党委办公室-456",
+        "type": "office",
+        "description": "党委办公室",
+        "teachers": ["周微微", "陆凤兰", "赵清理"],
+        "image": "/images/456.png"
+      }
+    ],
   "corridors": [
     {
       "id": "main-corridor-1",
@@ -196,23 +237,6 @@
     }
   ],
   "areas": [
-    {
-      "id": "teaching-area",
-      "name": "教学区",
-      "position": {"x": -30, "y": 0, "z": -20},
-      "dimensions": {"width": 20, "height": 0.1, "depth": 10}
-    },
-    {
-      "id": "experimental-area-1",
-      "name": "实验区1",
-      "position": {"x": 20, "y": 0, "z": -20},
-      "dimensions": {"width": 30, "height": 0.1, "depth": 10}
-    },
-    {
-      "id": "experimental-area-2",
-      "name": "实验区2",
-      "position": {"x": 20, "y": 0, "z": 20},
-      "dimensions": {"width": 30, "height": 0.1, "depth": 10}
-    }
+
   ]
 } 

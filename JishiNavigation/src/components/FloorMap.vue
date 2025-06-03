@@ -1,14 +1,40 @@
 <template>
     <div class="floor-map">
         <div ref="container" class="scene-container"></div>
+        <div class="room-buttons">
+            <button v-for="room in rooms" :key="room.id" class="room-button"
+                :class="{ 'active': selectedRoom?.id === room.id }" @click="selectRoom(room)">
+                {{ room.id }}
+            </button>
+        </div>
+        <div class="sidebar" v-if="selectedRoom">
+            <div class="room-info">
+                <div class="room-image" v-if="selectedRoom.image">
+                    <img :src="selectedRoom.image" :alt="selectedRoom.name">
+                </div>
+                <h3>{{ selectedRoom.name }}</h3>
+                <div class="info-item">
+                    <label>房间号：</label>
+                    <span>{{ selectedRoom.id }}</span>
+                </div>
+                <div class="info-item">
+                    <label>类型：</label>
+                    <span>{{ selectedRoom.type === 'office' ? '办公室' : '实验室' }}</span>
+                </div>
+                <div class="info-item">
+                    <label>描述：</label>
+                    <p>{{ selectedRoom.description }}</p>
+                </div>
+                <div class="info-item" v-if="selectedRoom.teachers && selectedRoom.teachers.length">
+                    <label>教师：</label>
+                    <p>{{ selectedRoom.teachers.join('、') }}</p>
+                </div>
+            </div>
+        </div>
         <div class="controls">
             <div class="search-box">
                 <input v-model="searchQuery" placeholder="搜索房间..." @input="handleSearch" />
             </div>
-        </div>
-        <div class="room-info" v-if="selectedRoom">
-            <h3>{{ selectedRoom.name }}</h3>
-            <p>{{ selectedRoom.description }}</p>
         </div>
         <div class="loading" v-if="isLoading">
             <div class="loading-text">加载中... {{ loadingProgress }}%</div>
@@ -46,6 +72,7 @@ export default {
             isLoading: true,
             loadingProgress: 0,
             errorMessage: '',
+            rooms: [],
             _threeObjects: markRaw({
                 scene: null,
                 camera: null,
@@ -56,7 +83,9 @@ export default {
                 raycaster: null,
                 mouse: null,
                 model: null,
-                defaultCameraPosition: new THREE.Vector3(5, 5, 5)
+                defaultCameraPosition: new THREE.Vector3(5, 5, 5),
+                searchLight: null, // 搜索提示光源
+                lightAnimation: null // 光源动画
             })
         }
     },
@@ -66,6 +95,8 @@ export default {
             this.loadModel()
             this.setupRaycaster()
             this.startAnimation()
+            // 加载房间数据
+            this.loadRoomsData()
         })
         window.addEventListener('resize', this.onWindowResize)
     },
@@ -153,6 +184,15 @@ export default {
                     console.log('Model loaded successfully:', gltf)
                     three.model = gltf.scene
 
+                    // 遍历模型中的所有子网格
+                    gltf.scene.traverse((child) => {
+                        if (child.isMesh && child.name) {
+                            console.log('Found mesh:', child.name, child.position)
+                            // 存储房间网格引用
+                            three.roomMeshes.set(child.name, child)
+                        }
+                    })
+
                     // 自动调整模型大小和位置
                     const box = new THREE.Box3().setFromObject(gltf.scene)
                     const center = box.getCenter(new THREE.Vector3())
@@ -188,6 +228,11 @@ export default {
             )
         },
 
+        loadRoomsData() {
+            // 从rooms.json加载房间数据
+            this.rooms = roomsData.rooms
+        },
+
         loadRooms() {
             const three = this._threeObjects
 
@@ -199,7 +244,6 @@ export default {
                 )
 
                 const material = new THREE.MeshStandardMaterial({
-                    color: roomData.type === 'office' ? 0x88ccff : 0x90caf9,
                     roughness: 0.7,
                     metalness: 0.3,
                     transparent: true,
@@ -309,24 +353,6 @@ export default {
             const onMouseMove = (event) => {
                 three.mouse.x = (event.clientX / window.innerWidth) * 2 - 1
                 three.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1
-
-                three.raycaster.setFromCamera(three.mouse, three.camera)
-                const intersects = three.raycaster.intersectObjects(three.scene.children)
-
-                three.roomMeshes.forEach(mesh => {
-                    if (mesh.material) {
-                        mesh.material.color.setHex(
-                            mesh.userData.roomData.type === 'office' ? 0x88ccff : 0x90caf9
-                        )
-                    }
-                })
-
-                for (const intersect of intersects) {
-                    if (intersect.object.userData.roomData) {
-                        intersect.object.material.color.setHex(0xff8888)
-                        break
-                    }
-                }
             }
 
             const onClick = (event) => {
@@ -338,7 +364,7 @@ export default {
 
                 for (const intersect of intersects) {
                     if (intersect.object.userData.roomData) {
-                        this.selectedRoom = { ...intersect.object.userData.roomData }
+                        this.selectRoom(intersect.object.userData.roomData)
                         break
                     }
                 }
@@ -415,6 +441,9 @@ export default {
             if (this.$refs.container) {
                 this.$refs.container.removeEventListener('dblclick', this.resetCamera)
             }
+
+            // 移除搜索光源
+            this.removeSearchLight()
         },
 
         onWindowResize() {
@@ -429,55 +458,208 @@ export default {
 
         handleSearch() {
             const three = this._threeObjects
+            const query = this.searchQuery.toLowerCase().trim()
 
-            three.roomMeshes.forEach(mesh => {
-                mesh.material.color.setHex(
-                    mesh.userData.roomData.type === 'office' ? 0x88ccff : 0x90caf9
-                )
-            })
+            // 移除之前的搜索光源
+            this.removeSearchLight()
 
-            if (this.searchQuery) {
-                const query = this.searchQuery.toLowerCase()
-                three.roomMeshes.forEach(mesh => {
-                    const roomData = mesh.userData.roomData
-                    if (
-                        roomData.name.toLowerCase().includes(query) ||
-                        roomData.description.toLowerCase().includes(query)
-                    ) {
-                        mesh.material.color.setHex(0xff8888)
-                    }
+            if (!query) {
+                return
+            }
+
+            // 在rooms数据中搜索
+            const foundRoom = this.rooms.find(room =>
+                room.id.toLowerCase().includes(query) ||
+                room.name.toLowerCase().includes(query) ||
+                room.description.toLowerCase().includes(query) ||
+                (room.teachers && room.teachers.some(teacher =>
+                    teacher.toLowerCase().includes(query)
+                ))
+            )
+
+            if (foundRoom) {
+                // 输出找到的房间信息
+                console.log('找到房间:', {
+                    id: foundRoom.id,
+                    name: foundRoom.name,
+                    type: foundRoom.type
                 })
+
+                // 更新选中的房间
+                this.selectedRoom = foundRoom
+
+                // 在3D模型中查找对应的房间mesh
+                let roomMesh = null
+                if (three.model) {
+                    three.model.traverse((child) => {
+                        if (child.isMesh && child.name) {
+                            // 输出所有mesh的名字，帮助调试
+                            console.log('遍历到Mesh:', child.name)
+
+                            if (child.name === foundRoom.id) {
+                                roomMesh = child
+                                const worldPosition = child.getWorldPosition(new THREE.Vector3())
+                                // 输出找到的mesh信息
+                                console.log('找到对应Mesh:', {
+                                    name: child.name,
+                                    position: child.position,
+                                    worldPosition: worldPosition
+                                })
+                                // 在房间位置添加闪烁的点光源
+                                this.addSearchLight(worldPosition)
+                            }
+                        }
+                    })
+
+                    if (!roomMesh) {
+                        console.warn('未找到房间对应的Mesh:', foundRoom.id)
+                    }
+                } else {
+                    console.warn('3D模型未加载')
+                }
+
+                if (roomMesh) {
+                    // 移动相机到房间位置
+                    const worldPosition = new THREE.Vector3()
+                    roomMesh.getWorldPosition(worldPosition)
+                    this.moveCameraToTarget(worldPosition)
+                }
+            } else {
+                // 没有找到匹配的房间
+                this.showNoResultsMessage()
             }
         },
 
-        resetCamera() {
-            const three = this._threeObjects
-            if (three.controls) {
-                // 使用 GSAP 添加动画效果
-                const duration = 1
-                const ease = 'power2.inOut'
+        resetSearchState() {
+            // 清除错误消息
+            this.errorMessage = ''
+        },
 
-                // 重置相机位置
-                gsap.to(three.camera.position, {
-                    duration,
-                    ease,
-                    x: three.defaultCameraPosition.x,
-                    y: three.defaultCameraPosition.y,
-                    z: three.defaultCameraPosition.z
-                })
+        showNoResultsMessage() {
+            this.errorMessage = '未找到匹配的房间'
+            // 3秒后自动清除错误消息
+            setTimeout(() => {
+                this.errorMessage = ''
+            }, 3000)
+        },
 
-                // 重置控制器目标点
-                gsap.to(three.controls.target, {
-                    duration,
-                    ease,
-                    x: 0,
-                    y: 0,
-                    z: 0,
-                    onUpdate: () => {
-                        three.camera.lookAt(three.controls.target)
-                        three.controls.update()
+        selectRoom(room) {
+            this.selectedRoom = room
+
+            const three = this._threeObjects;
+            // 移除之前的搜索光源
+            this.removeSearchLight();
+
+            if (three.model) {
+                let roomMesh = null;
+                three.model.traverse((child) => {
+                    if (child.isMesh && child.name === room.id) {
+                        roomMesh = child;
                     }
-                })
+                });
+
+                if (roomMesh) {
+                    const worldPosition = new THREE.Vector3();
+                    roomMesh.getWorldPosition(worldPosition);
+
+                    // 添加闪烁光源
+                    this.addSearchLight(worldPosition);
+                    // 平滑移动相机
+                    this.moveCameraToTarget(worldPosition);
+                } else {
+                    console.warn('未找到房间对应的 Mesh:', room.id);
+                }
+            } else {
+                console.warn('3D 模型尚未加载完成');
+            }
+
+        },
+
+        focusOnRoom(roomMesh) {
+            const three = this._threeObjects
+            const position = roomMesh.position.clone()
+            position.y += 5 // 稍微抬高视角
+            position.z += 5 // 向后移动一些
+
+            // 使用GSAP动画平滑移动相机
+            gsap.to(three.camera.position, {
+                x: position.x,
+                y: position.y,
+                z: position.z,
+                duration: 1,
+                ease: 'power2.inOut'
+            })
+
+            // 让相机看向房间中心
+            three.controls.target.copy(roomMesh.position)
+            three.controls.update()
+        },
+
+        resetHighlight() {
+            const three = this._threeObjects
+            if (three.highlightedRoom && three.originalColors.has(three.highlightedRoom.name)) {
+                // 恢复原始颜色
+                three.highlightedRoom.material.color.copy(three.originalColors.get(three.highlightedRoom.name))
+                three.highlightedRoom = null
+            }
+        },
+
+        moveCameraToTarget(targetPosition) {
+            const three = this._threeObjects
+            const camera = three.camera
+            const controls = three.controls
+
+            // 使用GSAP动画平滑移动相机
+            gsap.to(camera.position, {
+                x: targetPosition.x + 0.5,
+                y: targetPosition.y + 2,
+                z: targetPosition.z + 0.5,
+                duration: 1,
+                ease: 'power2.inOut'
+            })
+
+            // 让相机看向目标位置
+            controls.target.copy(targetPosition)
+            controls.update()
+        },
+
+        addSearchLight(position) {
+            const three = this._threeObjects
+
+
+            // 创建点光源
+            const light = new THREE.PointLight(0xff0000, 2, 3)
+            light.position.set(position.x + 0.2, position.y + 0.5, position.z)
+            three.scene.add(light)
+            three.searchLight = light
+
+            // 创建光源辅助球体（让光源可见）
+            const sphereGeometry = new THREE.SphereGeometry(0.05, 16, 16)
+            const sphereMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 })
+            const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial)
+            light.add(sphere)
+
+            // 使用GSAP创建闪烁动画
+            three.lightAnimation = gsap.to(light, {
+                intensity: 0.5,
+                duration: 0.8,
+                repeat: -1,
+                yoyo: true,
+                ease: "power1.inOut"
+            })
+        },
+
+        removeSearchLight() {
+            const three = this._threeObjects
+            if (three.searchLight) {
+                // 停止动画
+                if (three.lightAnimation) {
+                    three.lightAnimation.kill()
+                    three.lightAnimation = null
+                }
+                // 移除光源
+                three.scene.remove(three.searchLight)
+                three.searchLight = null
             }
         }
     }
@@ -486,15 +668,108 @@ export default {
 
 <style scoped>
 .floor-map {
-    width: 100vw;
-    height: 100vh;
     position: relative;
-    background-color: #f0f0f0;
+    width: 100%;
+    height: 100vh;
 }
 
 .scene-container {
     width: 100%;
     height: 100%;
+}
+
+.room-buttons {
+    position: absolute;
+    top: 70px;
+    left: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    max-width: 80%;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+}
+
+.room-button {
+    padding: 8px 16px;
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.room-button:hover {
+    background: #f5f5f5;
+    transform: translateY(-2px);
+}
+
+.room-button.active {
+    background: #2196f3;
+    color: white;
+    border-color: #1976d2;
+}
+
+.room-image {
+    width: 100%;
+    height: 200px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.room-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.sidebar {
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 300px;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 20px;
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+    z-index: 100;
+}
+
+.room-info {
+    margin-top: 20px;
+}
+
+.room-info h3 {
+    font-size: 1.5em;
+    margin-bottom: 20px;
+    color: #333;
+    border-bottom: 2px solid #2196f3;
+    padding-bottom: 10px;
+}
+
+.info-item {
+    margin-bottom: 15px;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.info-item label {
+    font-weight: bold;
+    color: #666;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.info-item p {
+    margin: 5px 0;
+    color: #333;
+    line-height: 1.4;
 }
 
 .controls {
@@ -510,16 +785,6 @@ export default {
     border-radius: 4px;
     background: rgba(255, 255, 255, 0.9);
     width: 200px;
-}
-
-.room-info {
-    position: absolute;
-    right: 20px;
-    top: 20px;
-    background: rgba(255, 255, 255, 0.9);
-    padding: 20px;
-    border-radius: 8px;
-    max-width: 300px;
 }
 
 .loading {
@@ -540,15 +805,34 @@ export default {
 }
 
 .error-message {
-    position: absolute;
-    top: 50%;
+    position: fixed;
+    top: 20px;
     left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(255, 0, 0, 0.7);
+    transform: translateX(-50%);
+    background: rgba(255, 0, 0, 0.8);
     color: white;
-    padding: 20px;
-    border-radius: 8px;
-    text-align: center;
+    padding: 10px 20px;
+    border-radius: 4px;
+    z-index: 1000;
+    animation: fadeInOut 3s ease-in-out;
+}
+
+@keyframes fadeInOut {
+    0% {
+        opacity: 0;
+    }
+
+    10% {
+        opacity: 1;
+    }
+
+    90% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
 }
 
 .controls-tips {
